@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">My</string>
+    <string name="title_home">主页</string>
+    <string name="title_shelf">书架</string>
+    <string name="title_topic">话题</string>
+    <string name="title_myInfo">我的</string>
+</resources>
