@@ -21,6 +21,7 @@ import java.util.Map;
 
 public class Sub_home2 extends Fragment {
     private GridView gridView;
+    private String[] bookid;
     private List<Map<String,Object>> list;
     @Nullable
     @Override
@@ -31,11 +32,8 @@ public class Sub_home2 extends Fragment {
         gridView = view.findViewById(R.id.sub_home_gridview2);
         HomeBookList sub_home2 = new HomeBookList();
         list=null;
-
         list = sub_home2.initData(2);
-        if(list==null){
-            Toast.makeText(getActivity(),"Failure",Toast.LENGTH_SHORT).show();
-        }
+        bookid = sub_home2.getBookid();
         sub_home2();
         return view;
     }
@@ -46,14 +44,11 @@ public class Sub_home2 extends Fragment {
         SimpleAdapter adapter = new SimpleAdapter(getActivity(),list, R.layout.book,from,to);
         gridView.setAdapter(adapter);
         resize();
-
-
-
         gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Intent intent = new Intent(getActivity(), Book_detail.class);
-                intent.putExtra("id",position);
+                intent.putExtra("id",bookid[position]);
                 startActivity(intent);
             }
         });

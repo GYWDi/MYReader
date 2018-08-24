@@ -27,7 +27,7 @@ import java.util.Map;
 public class Sub_home1 extends Fragment {
     private GridView gridView;
     private List<Map<String,Object>> list;
-    private int[] bookid;
+    private String[] bookid;
 
     @Nullable
     @Override

@@ -33,9 +33,9 @@ public class MainActivity extends AppCompatActivity {
                 case R.id.navigation_shelf:
                     switchFragment(R.id.navigation_shelf);
                     return true;
-                case R.id.navigation_topic:
-                    switchFragment(R.id.navigation_topic);
-                    return true;
+//                case R.id.navigation_topic:
+//                    switchFragment(R.id.navigation_topic);
+//                    return true;
                 case R.id.navigation_myInfo:
                     switchFragment(R.id.navigation_myInfo);
                     return true;
@@ -49,6 +49,8 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        //利用Book构造函数初始化主页书籍信息
+     //   Book book = new Book();
 
         //从数据库中获得userid
         Intent intent = getIntent();
@@ -80,11 +82,11 @@ public class MainActivity extends AppCompatActivity {
                     transaction.commit();
                     lastFragment =R.id.navigation_shelf;
                     return;
-                case R.id.navigation_topic:
-                    transaction.replace(R.id.layout_content, new Fragment3());
-                    transaction.commit();
-                    lastFragment =R.id.navigation_topic;
-                    return;
+//                case R.id.navigation_topic:
+//                    transaction.replace(R.id.layout_content, new Fragment3());
+//                    transaction.commit();
+//                    lastFragment =R.id.navigation_topic;
+//                    return;
                 case R.id.navigation_myInfo:
                     transaction.replace(R.id.layout_content, new Fragment4());
                     transaction.commit();

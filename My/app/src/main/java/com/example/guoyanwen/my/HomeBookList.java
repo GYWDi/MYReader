@@ -1,6 +1,6 @@
 package com.example.guoyanwen.my;
 
-import android.widget.GridView;
+
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -8,40 +8,50 @@ import java.util.List;
 import java.util.Map;
 
 public class HomeBookList {
-    private int[] bookid;
-
-    public int[] getBookid() {
+    private String[] bookid;
+    private int num;
+    private int[] inoc;
+    private String[] bookname;
+    public String[] getBookid() {
         return bookid;
     }
 
     public List initData(int kind){
+        num = 0;
         List<Map<String,Object>> list;
-        //从数据库中得到相应种类的书
-
-        bookid = new int[10];
-
-        //书的封面
-        int[] inoc={
-                R.mipmap.radio,R.mipmap.radio,R.mipmap.radio,
-                R.mipmap.radio,R.mipmap.radio,R.mipmap.radio,
-                R.mipmap.radio,R.mipmap.radio,R.mipmap.radio,
-                R.mipmap.radio,R.mipmap.radio,R.mipmap.radio
-        };
-        //书的名称
-        String[] label={
-                "1","2","3","4","5","6","7","8",
-                "1","2","3","4"
-        };
-        //书的id
-        for(int i=0;i<10;i++){
-            bookid[i] = i;
+        if(kind==1){
+            int count=0;
+            bookid = new String[Book.count1];
+            inoc = new int[Book.count1];
+            bookname = new String[Book.count1];
+            for(int i=0;i<Book.sum;i++){
+                if((Book.kind[i]).equals("1")){
+                    bookid[count] = Book.bookid[i];
+                    inoc[count] = Book.inoc[i];
+                    bookname[count]=Book.bookname[i];
+                    count++;
+                }
+            }
+        }else if(kind==2){
+            int count=0;
+            bookid = new String[Book.count1];
+            inoc = new int[Book.count1];
+            bookname = new String[Book.count1];
+            for(int i=0;i<Book.sum;i++){
+                if((Book.kind[i]).equals("2")){
+                     bookid[count] = Book.bookid[i];
+                     inoc[count] = Book.inoc[i];
+                     bookname[count]=Book.bookname[i];
+                     count++;
+                }
+            }
         }
         Map<String,Object> map;
         list = new ArrayList<Map<String,Object>>();
-        for(int i=0;i<label.length;i++){
+        for(int i=0;i<Book.count1;i++){
             map = new HashMap<String,Object>();
             map.put("img",inoc[i]);
-            map.put("text",label[i]);
+            map.put("text",bookname[i]);
             list.add(map);
         }
         return list;

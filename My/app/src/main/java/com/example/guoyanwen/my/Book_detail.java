@@ -12,8 +12,12 @@ import android.widget.SimpleAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
 
+
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
+
 import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -27,7 +31,10 @@ public class Book_detail extends AppCompatActivity {
     private TextView tv;
     private Button read;
     private Button collection;
-    private int book_id;
+    private String[] label;
+    private String[] value;
+    private String bookid;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -38,77 +45,132 @@ public class Book_detail extends AppCompatActivity {
         read = findViewById(R.id.read);
         collection = findViewById(R.id.collection);
 
-
-
+        Intent intent = getIntent();
+        bookid = intent.getStringExtra("id");
         setListener();
         book_detail();
     }
-
+    private void book_detail(){
+        initData();
+    }
     private void setListener(){
         read.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(Book_detail.this, Read_book.class);
-                intent.putExtra("id",book_id);
+                intent.putExtra("id",bookid);
                 startActivity(intent);
             }
         });
         collection.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //UserInfo.userid  && bookid;  发送请求
+                setCollection();
             }
         });
     }
     private void initData(){
-        Book book = new Book();
         tv.setText("暂无");
         new Thread(new Runnable() {
             @Override
             public void run() {
-                String url=HttpUtilsHttpURLConnection.BASE_URL+"/ReturnMybookList";
+                String url = HttpUtilsHttpURLConnection.BASE_URL + "/GetBook";
                 Map<String, String> params = new HashMap<String, String>();
-                params.put("userid",UserInfo.userid);
-                String result = HttpUtilsHttpURLConnection.getContextByHttp(url,params);
+                params.put("bookid", bookid);
+                String result = HttpUtilsHttpURLConnection.getContextByHttp(url, params);
                 Message msg = new Message();
-                msg.what=0x13;
-                Bundle data=new Bundle();
-                data.putString("result",result);
+                msg.what = 0x14;
+                Bundle data = new Bundle();
+                data.putString("result", result);
                 msg.setData(data);
+
                 hander.sendMessage(msg);
             }
 
-            Handler hander = new Handler(){
+            Handler hander = new Handler() {
                 @Override
                 public void handleMessage(Message msg) {
-                    if (msg.what==0x13){
+                    if (msg.what == 0x14) {
                         Bundle data = msg.getData();
                         String key = data.getString("result");//得到json返回的json
-                        try {
-                            JSONObject json= new JSONObject(key);
-                            String id = (String)json.get("userid");
-                            String result = (String) json.get("result");
+                        JSONArray jsonArray = JSON.parseArray(key);
+                        int size = jsonArray.size();
 
-                        } catch (JSONException e) {
-                            e.printStackTrace();
+
+
+                        for (int i = 0; i < size; i++) {
+                            list = new ArrayList<Map<String,String>>();
+
+                            Map map = new HashMap<String,String>();
+                            JSONObject jsonObject = jsonArray.getJSONObject(i);
+                            map.put("title","书名");
+                            map.put("content",jsonObject.getString("bookname"));
+                            list.add(map);
+                            map = new HashMap<String,String>();
+                            map.put("title","ISBN");
+                            map.put("content",jsonObject.getString("ISBN"));
+                            list.add(map);
+
+                            map = new HashMap<String,String>();
+                            map.put("title","出版社");
+                            map.put("content",jsonObject.getString("publish"));
+                            list.add(map);
+                            map = new HashMap<String,String>();
+                            map.put("title","作者");
+                            map.put("content",jsonObject.getString("writer"));
+                            list.add(map);
+
+
+                            String[] from={"title","content"};
+                            int[] to ={R.id.title,R.id.content};
+                            SimpleAdapter adapter = new SimpleAdapter(Book_detail.this,list, R.layout.user,from,to);
+                            listView.setAdapter(adapter);
                         }
                     }
                 }
             };
         }).start();
-        list = new ArrayList<Map<String,String>>();
-        for(int i=0;i<label.length;i++){
-            map = new HashMap<String,String>();
-            map.put("label",label[i]);
-            map.put("value",value[i]);
-            list.add(map);
-        }
-        String [] from = {"label","value"};
-        int[] to ={R.id.title,R.id.content};
-        SimpleAdapter adapter = new SimpleAdapter(Book_detail.this,list, R.layout.user,from,to);
-        listView.setAdapter(adapter);
     }
-    private void book_detail(){
-        //initData();
+    private void setCollection(){
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                String url = HttpUtilsHttpURLConnection.BASE_URL + "/NewCollection";
+                Map<String, String> params = new HashMap<String, String>();
+                params.put("userid",UserInfo.userid);
+                params.put("bookid",bookid);
+                String result = HttpUtilsHttpURLConnection.getContextByHttp(url, params);
+                Message msg = new Message();
+                msg.what = 0x20;
+                Bundle data = new Bundle();
+                data.putString("result", result);
+                msg.setData(data);
+                hander.sendMessage(msg);
+            }
+
+            Handler hander = new Handler() {
+                @Override
+                public void handleMessage(Message msg) {
+                    if (msg.what == 0x20) {
+                        Bundle data = msg.getData();
+                        String key = data.getString("result");//得到json返回的json
+                        try {
+                            org.json.JSONObject json= new org.json.JSONObject(key);
+                            String id = (String)json.get("userid");
+                            String result = (String) json.get("result");
+                            if ("success".equals(result)){
+                                Toast.makeText(Book_detail.this,"添加成功",Toast.LENGTH_LONG).show();
+                            }else if("error".equals(result)){
+                                Toast.makeText(Book_detail.this,"已添加无需再次添加",Toast.LENGTH_LONG).show();
+                            }
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+
+                    }
+                }
+            };
+        }).start();
+
     }
 }

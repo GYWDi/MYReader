@@ -1,5 +1,6 @@
 package com.example.guoyanwen.my;
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
@@ -23,6 +24,7 @@ public class Login extends AppCompatActivity {
     private Button register;
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         setContentView(R.layout.login);
         init();
         setListener();
@@ -63,6 +65,7 @@ public class Login extends AppCompatActivity {
                         hander.sendMessage(msg);
                     }
 
+                    @SuppressLint("HandlerLeak")
                     Handler hander = new Handler(){
                         @Override
                         public void handleMessage(Message msg) {
@@ -73,13 +76,20 @@ public class Login extends AppCompatActivity {
                                     JSONObject json= new JSONObject(key);
                                     String id = (String)json.get("userid");
                                     String result = (String) json.get("result");
-                                    if ("success".equals(result)){
+                                    if (result.equals("success")){
+                                        Book book = new Book();
                                         Toast.makeText(Login.this,"登录成功",Toast.LENGTH_LONG).show();
+                                        try {
+                                            Thread.sleep(1500);
+                                        } catch (InterruptedException e) {
+                                            e.printStackTrace();
+                                        }
                                         Intent intent=new Intent(Login.this,MainActivity.class);
                                         intent.putExtra("userid",id);
                                         startActivity(intent);
-                                    }else if("error".equals(result)){
-                                        Toast.makeText(Login.this,"登录失败",Toast.LENGTH_LONG).show();
+                                    }
+                                    if(result.equals("error")){
+                                        Toast.makeText(Login.this,"登录失败",Toast.LENGTH_SHORT).show();
                                     }
                                 } catch (JSONException e) {
                                     e.printStackTrace();
